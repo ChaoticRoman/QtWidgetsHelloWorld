@@ -32,5 +32,5 @@ that accomplishes following:
 * [ ] List of item is dynamic
     * Items can be added, removed and modified from UI
 
-* [ ] C++ code is aware of dynamic collection of items
+* [x] C++ code is aware of dynamic collection of items
     * It can e.g. randomly adjust price of every item independent of UI
