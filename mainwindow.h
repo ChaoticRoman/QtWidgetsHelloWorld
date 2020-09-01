@@ -17,6 +17,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void updateDetail(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
     FruitListModel model_;
