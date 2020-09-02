@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
         selectionChanged(newIndex);
     }
 
-    // Data changed
+    // Data changed from external source
     connect(&model_, &FruitListModel::dataChanged,
             this, &MainWindow::dataChanged);
 
@@ -42,6 +42,19 @@ MainWindow::MainWindow(QWidget *parent)
     // Rows removed
     connect(&model_, &FruitListModel::rowsRemoved,
             this, &MainWindow::rowsRemoved);
+
+    // Field edits
+    connect(ui_->nameLineEdit, &QLineEdit::editingFinished, [this]() {
+        model_.setName(currentRow_, ui_->nameLineEdit->text());
+    });
+
+    // There are two signals of name QDoubleSpinBox::valueChanged, we need to tell which one. See:
+    // https://stackoverflow.com/questions/16794695/connecting-overloaded-signals-and-slots-in-qt-5
+    // https://en.cppreference.com/w/cpp/language/overloaded_address
+    void (QDoubleSpinBox::*pointerToOverloadedSignal)(double) = &QDoubleSpinBox::valueChanged;
+    connect(ui_->priceSpinBox, pointerToOverloadedSignal, [this](double value) {
+        model_.setPrice(currentRow_, value);
+    });
 }
 
 MainWindow::~MainWindow()

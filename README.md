@@ -29,7 +29,7 @@ that accomplishes following:
     * e.g. it is a plain C++ object or Q_OBJECT (preferably plain
       C++ object with Q_OBJECT interface to QML)
 
-* [ ] List of item is dynamic
+* [x] List of item is dynamic
     * Items can be added, removed and modified from UI
 
 * [x] C++ code is aware of dynamic collection of items
