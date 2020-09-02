@@ -19,12 +19,20 @@ public:
     ~MainWindow();
 
 private slots:
+    void selectionChanged(const QModelIndex &index);
     void dataChanged(const QModelIndex &top, const QModelIndex &bottom);
-    void updateDetail(const QModelIndex &index);
+    void updateDetail();
+    void itemRemovalRequested();
+    void rowsRemoved();
 
 private:
     Ui::MainWindow *ui_;
     FruitListModel model_;
     QTimer inflationTimer_;
+
+    QModelIndex currentIndex_;
+    int currentRow_ = -1;
+
+    bool indexOnValiditem();
 };
 #endif // MAINWINDOW_H

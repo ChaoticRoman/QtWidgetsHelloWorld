@@ -10,15 +10,21 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui_->list->setModel(&model_);
 
-    // ListView selection to detail update connection and initialization
+    // ListView selection changed
     connect(ui_->list, &QListView::activated,
-            this, &MainWindow::updateDetail);
+            this, &MainWindow::selectionChanged);
     connect(ui_->list, &QListView::clicked,
-            this, &MainWindow::updateDetail);
-    ui_->list->setCurrentIndex(model_.index(0));
-    emit ui_->list->clicked(ui_->list->currentIndex());
+            this, &MainWindow::selectionChanged);
 
-    // Data change to detail update connection
+    // Initial selection handling
+    if (model_.rowCount() > 0)
+    {
+        QModelIndex newIndex = model_.index(0);
+        ui_->list->setCurrentIndex(newIndex);
+        selectionChanged(newIndex);
+    }
+
+    // Data changed
     connect(&model_, &FruitListModel::dataChanged,
             this, &MainWindow::dataChanged);
 
@@ -30,6 +36,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Buttons
     connect(ui_->addButton, &QPushButton::clicked,
             &model_, &FruitListModel::addItem);
+    connect(ui_->deleteButton, &QPushButton::clicked,
+            this, &MainWindow::itemRemovalRequested);
+
+    // Rows removed
+    connect(&model_, &FruitListModel::rowsRemoved,
+            this, &MainWindow::rowsRemoved);
 }
 
 MainWindow::~MainWindow()
@@ -37,27 +49,73 @@ MainWindow::~MainWindow()
     delete ui_;
 }
 
-void MainWindow::dataChanged(const QModelIndex &top, const QModelIndex &bottom)
+void MainWindow::selectionChanged(const QModelIndex &index)
 {
-    QModelIndex current = ui_->list->currentIndex();
-    int currentRow = current.row();
-    if (top.row() <= currentRow && currentRow <= bottom.row())
-        updateDetail(current);
+    currentIndex_ = index;
+    int newRow = currentIndex_.row();
+    if (newRow != currentRow_)
+    {
+        currentRow_ = newRow;
+        updateDetail();
+    }
 }
 
-void MainWindow::updateDetail(const QModelIndex &index)
+void MainWindow::dataChanged(const QModelIndex &top, const QModelIndex &bottom)
 {
-    qDebug() << "Clicked" << index.row();
+    if (top.row() <= currentRow_ && currentRow_ <= bottom.row())
+        updateDetail();
+}
 
-    if (!ui_->nameLineEdit->hasFocus())
+void MainWindow::updateDetail()
+{
+    bool onValid = indexOnValiditem();
+
+    if (onValid)
     {
-        QString name = model_.data(index, FruitListModel::nameRole).toString();
-        ui_->nameLineEdit->setText(name);
+        if (!ui_->nameLineEdit->hasFocus())
+        {
+            QString name = model_.data(currentIndex_, FruitListModel::nameRole).toString();
+            ui_->nameLineEdit->setText(name);
+        }
+
+        if (!ui_->priceSpinBox->hasFocus())
+        {
+            double price = model_.data(currentIndex_, FruitListModel::priceRole).toDouble();
+            ui_->priceSpinBox->setValue(price);
+        }
+    }
+    else
+    {
+        ui_->nameLineEdit->setText("");
+        ui_->priceSpinBox->setValue(0);
     }
 
-    if (!ui_->priceSpinBox->hasFocus())
-    {
-        double price = model_.data(index, FruitListModel::priceRole).toDouble();
-        ui_->priceSpinBox->setValue(price);
-    }
+    ui_->nameLineEdit->setEnabled(onValid);
+    ui_->priceSpinBox->setEnabled(onValid);
+
+    // Update Detail is also updating delete button state
+    ui_->deleteButton->setEnabled(onValid);
+}
+
+void MainWindow::itemRemovalRequested()
+{
+    if (indexOnValiditem())
+        model_.removeItem(currentRow_);
+}
+
+void MainWindow::rowsRemoved()
+{
+    int newModelRowCount = model_.rowCount();
+
+    if (currentRow_ < newModelRowCount) // Current index was not on the last item,
+        return;                         // the dataChanged signal will care about
+
+    selectionChanged(model_.index(newModelRowCount - 1));
+}
+
+bool MainWindow::indexOnValiditem()
+{
+    if (currentRow_ < 0) return false;
+    if (currentRow_ >= model_.rowCount()) return false;
+    return true;
 }
