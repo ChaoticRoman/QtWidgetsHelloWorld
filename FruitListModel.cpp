@@ -23,9 +23,9 @@ QVariant FruitListModel::data(const QModelIndex &index, int role) const
     if (!inBounds(index.row()))
         return QVariant();
 
-    if (role == nameRole)
+    if (role == ItemDataRoles::nameRole)
         return QVariant::fromValue(fruitList_[index.row()].name);
-    else if (role == priceRole)
+    else if (role == ItemDataRoles::priceRole)
         return QVariant::fromValue(fruitList_[index.row()].price);
     else
         return QVariant();
@@ -34,8 +34,8 @@ QVariant FruitListModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> FruitListModel::roleNames() const
 {
     QHash<int, QByteArray> names;
-    names[nameRole] = "nameRole";
-    names[priceRole] = "priceRole";
+    names[ItemDataRoles::nameRole] = "nameRole";
+    names[ItemDataRoles::priceRole] = "priceRole";
     return names;
 }
 
