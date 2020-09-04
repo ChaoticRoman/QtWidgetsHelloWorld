@@ -20,14 +20,14 @@ public:
 
 private slots:
     void selectionChanged(const QModelIndex &index);
-    void dataChanged(const QModelIndex &top, const QModelIndex &bottom);
     void updateDetail();
+    void dataChanged(const QModelIndex &top, const QModelIndex &bottom);
     void itemRemovalRequested();
     void rowsRemoved();
 
 private:
     Ui::MainWindow *ui_;
-    FruitListModel model_;
+    FruitListModel model_ {this};
     QTimer inflationTimer_;
 
     QModelIndex currentIndex_;

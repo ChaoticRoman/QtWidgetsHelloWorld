@@ -14,7 +14,7 @@ class FruitListModel: public QAbstractListModel
     Q_OBJECT
 
 public:
-    FruitListModel(QObject *parent = nullptr);
+    FruitListModel(QObject *parent);
 
     enum ItemDataRoles {
         nameRole = Qt::DisplayRole,
@@ -39,5 +39,7 @@ private:
     QList<Fruit> fruitList_;
 
     bool inBounds(int i) const;
+
+    FruitListModel() = delete;
 };
 #endif // FRUITLISTMODEL_H

@@ -23,10 +23,12 @@ QVariant FruitListModel::data(const QModelIndex &index, int role) const
     if (!inBounds(index.row()))
         return QVariant();
 
+    // This role-based dispatch is important. The model-view mechanism
+    // will break if we would return e.g. name on requset for any role!
     if (role == ItemDataRoles::nameRole)
-        return QVariant::fromValue(fruitList_[index.row()].name);
+        return fruitList_[index.row()].name;
     else if (role == ItemDataRoles::priceRole)
-        return QVariant::fromValue(fruitList_[index.row()].price);
+        return fruitList_[index.row()].price;
     else
         return QVariant();
 }
@@ -39,7 +41,8 @@ QHash<int, QByteArray> FruitListModel::roleNames() const
     return names;
 }
 
-QVariantMap FruitListModel::get(int i) const {
+QVariantMap FruitListModel::get(int i) const
+{
     QHash<int, QByteArray> names = roleNames();
     QHashIterator<int, QByteArray> iter(names);
     QVariantMap res;
