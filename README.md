@@ -1,4 +1,4 @@
-# Qt/QML/C++ integration example
+# QWidgets/C++ integration example
 
 In this project I would like to build a boilerplate for a code
 that accomplishes following:
